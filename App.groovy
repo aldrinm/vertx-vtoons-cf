@@ -20,8 +20,6 @@ package webapp
 // stick it in a conf.json text file and specify that on the command line when
 // starting this verticle
 
-def env = container.env
-
 // Configuration for the web server
 def webServerConf = [
 
@@ -82,14 +80,13 @@ if (env['VCAP_SERVICES']) {
   }
 }
 
-
 // Now we deploy the modules that we need
 
 container.with {
 
   // Deploy a MongoDB persistor module
 
-  deployVerticle('mongo-persistor', mongoConf, 1) {
+  deployModule('mongo-persistor-v1.0', mongoConf) {
 
     // And when it's deployed run a script to load it with some reference
     // data for the demo
@@ -98,9 +95,10 @@ container.with {
 
   // Deploy an auth manager to handle the authentication
 
-  deployVerticle('auth-mgr')
+  deployModule('auth-mgr-v1.0')
 
   // Start the web server, with the config we defined above
 
-  deployVerticle('web-server', webServerConf)
+  deployModule('web-server-v1.0', webServerConf)
+
 }
