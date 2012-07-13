@@ -20,6 +20,8 @@ package webapp
 // stick it in a conf.json text file and specify that on the command line when
 // starting this verticle
 
+def env = container.env
+
 // Configuration for the web server
 def webServerConf = [
 
