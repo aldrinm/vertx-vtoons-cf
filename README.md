@@ -130,3 +130,7 @@ The important responses the `vmc push` prompts are these:
 
 Note that if you copy this project and try to push it, you will have to change the name to something other than `vertx-vtoons`.
 
+## Comments, Feedback, Questions
+
+Any comments, questions, or feedback can be sent to [@scottyfred](https://twitter.com/scottyfred).
+
