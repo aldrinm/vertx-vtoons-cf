@@ -82,14 +82,13 @@ if (env['VCAP_SERVICES']) {
   }
 }
 
-
 // Now we deploy the modules that we need
 
 container.with {
 
   // Deploy a MongoDB persistor module
 
-  deployVerticle('mongo-persistor', mongoConf, 1) {
+  deployModule('vertx.mongo-persistor-v1.0', mongoConf, 1) {
 
     // And when it's deployed run a script to load it with some reference
     // data for the demo
@@ -98,9 +97,10 @@ container.with {
 
   // Deploy an auth manager to handle the authentication
 
-  deployVerticle('auth-mgr')
+  deployModule('vertx.auth-mgr-v1.0')
 
   // Start the web server, with the config we defined above
 
-  deployVerticle('web-server', webServerConf)
+  deployModule('vertx.web-server-v1.0', webServerConf)
+
 }
