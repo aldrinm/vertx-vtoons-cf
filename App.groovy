@@ -88,7 +88,7 @@ container.with {
 
   // Deploy a MongoDB persistor module
 
-  deployModule('mongo-persistor-v1.0', mongoConf, 1) {
+  deployModule('mongo-persistor-v1.0', mongoConf) {
 
     // And when it's deployed run a script to load it with some reference
     // data for the demo
