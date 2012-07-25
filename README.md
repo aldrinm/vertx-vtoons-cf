@@ -69,15 +69,6 @@ SSL and HTTPS on CloudFoundry is tricky. In order to simplify this example, the 
 
 A full vert.x distribution (available on the [Downloads](http://vertx.io/downloads.html) page of the vert.x web site) must be pushed to CloudFoundry along with the application. A vert.x distribution is included in the `vert.x` directory of this project.
 
-#### Launch Script
-
-CloudFoundry sets up the Java environment based on parameters provided when the application is pushed. These parameters are passed to the JVM when the application is launched using the `$JAVA_OPTS` environment variable. When using vert.x 1.1.0, the run script (`/bin/vertx` in the downloaded distribution) needs to be modified to pass this environment variable to the JVM on launch. The last line of the `vertx` script in the distribution included with the sample has been modified to look like this: 
-
-    java $JAVA_OPTS -Djava.util.logging.config.file=$DIRNAME/../conf/logging.properties -Djruby.home=$JRUBY_HOME \
-    -Dvertx.mods=$VERTX_MODS -Dvertx.install=$SCRIPTDIR/.. -cp $CLASSPATH org.vertx.java.deploy.impl.cli.Starter "$@"
-    
-This change will not be required with the upcoming vert.x 1.2.0 release, as the launch script now passes the `$JAVA_OPT` environment variable to the JVM at launch.
-
 ## Pushing the Application to CloudFoundry
 
 Since this sample application uses Groovy, no compilation of the application files is required. The application files, along with the vert.x distribution can be pushed to CloudFoundry using the `vmc push` command: 
