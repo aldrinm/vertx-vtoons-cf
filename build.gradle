@@ -1,0 +1,62 @@
+repositories {
+    mavenCentral()
+
+    add(new org.apache.ivy.plugins.resolver.URLResolver()) {
+        name = 'vertx.io'
+        addArtifactPattern 'http://[organisation]/downloads/[module]-[revision].[ext]'
+    }
+
+    add(new org.apache.ivy.plugins.resolver.URLResolver()) {
+        name = 'vertx-mods'
+        addArtifactPattern 'https://github.com/vert-x/vertx-mods/blob/gh-pages/mods/[module]-v[revision]/mod.zip'
+    }
+}
+
+configurations {
+    framework
+    modules
+}
+
+dependencies {
+    framework "vertx.io:vert.x:${vertxVersion}@tar.gz"
+    modules "vertx-mods:vertx.mongo-persistor:${vertxMongoVersion}"
+}
+
+task assemble(type: Copy) {
+	group = 'vertx-vtoons'
+
+    destinationDir file('build')
+
+	from configurations.framework
+	from(configurations.modules) {
+        into 'mods'
+	}
+	
+	doLast {
+	    ant.gunzip(src: "build/vert.x-${vertxVersion}.tar.gz", dest: "build/vert.x-${vertxVersion}.tar")
+	    ant.untar(src: "build/vert.x-${vertxVersion}.tar", dest: "build")
+	}
+	
+}
+
+/*
+task dist(type: Zip) {
+  group = 'vert.x'
+  description 'Create the distribution'
+  
+  compression = org.gradle.api.tasks.bundling.Compression.GZIP
+  destinationDir file('build/distributions')
+  inputs.files files("build/$rootProject.name-$version")
+  outputs.dir destinationDir
+  baseName = rootProject.name
+  version = rootProject.version
+  extension = 'tar.gz'
+  // from 'build'
+  // include "$rootProject.name-$version/**"
+	
+	from 'src'
+	into ('vertx') {
+	  from configurations.runtime
+	}
+}
+*/
