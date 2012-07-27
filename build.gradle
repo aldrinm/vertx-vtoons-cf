@@ -35,28 +35,12 @@ task assemble(type: Copy) {
 	doLast {
 	    ant.gunzip(src: "build/vert.x-${vertxVersion}.tar.gz", dest: "build/vert.x-${vertxVersion}.tar")
 	    ant.untar(src: "build/vert.x-${vertxVersion}.tar", dest: "build")
+	    // delete .tar.gz and .tar files
 	}
 	
 }
 
-/*
 task dist(type: Zip) {
-  group = 'vert.x'
-  description 'Create the distribution'
+group = 'vertx-vtoons'
   
-  compression = org.gradle.api.tasks.bundling.Compression.GZIP
-  destinationDir file('build/distributions')
-  inputs.files files("build/$rootProject.name-$version")
-  outputs.dir destinationDir
-  baseName = rootProject.name
-  version = rootProject.version
-  extension = 'tar.gz'
-  // from 'build'
-  // include "$rootProject.name-$version/**"
-	
-	from 'src'
-	into ('vertx') {
-	  from configurations.runtime
-	}
 }
-*/
