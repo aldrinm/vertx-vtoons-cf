@@ -1,3 +1,32 @@
+/*
+ * Copyright 2012 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+buildscript {
+    repositories {
+        mavenCentral()
+        mavenRepo url:'http://maven.springframework.org/milestone/'
+    }
+    dependencies {
+        classpath group: 'org.gradle.api.plugins', name: 'gradle-cf-plugin', version: '0.2.0'
+    }
+}
+ 
+apply plugin: 'cloudfoundry'
+
 repositories {
     mavenCentral()
 
@@ -5,42 +34,66 @@ repositories {
         name = 'vertx.io'
         addArtifactPattern 'http://[organisation]/downloads/[module]-[revision].[ext]'
     }
-
-    add(new org.apache.ivy.plugins.resolver.URLResolver()) {
-        name = 'vertx-mods'
-        addArtifactPattern 'https://github.com/vert-x/vertx-mods/blob/gh-pages/mods/[module]-v[revision]/mod.zip'
-    }
 }
 
 configurations {
     framework
-    modules
 }
 
 dependencies {
     framework "vertx.io:vert.x:${vertxVersion}@tar.gz"
-    modules "vertx-mods:vertx.mongo-persistor:${vertxMongoVersion}"
+}
+
+def distDir = 'build/dist'
+def vertxDistDir = "build/dist/vert.x-${vertxVersion}"
+
+/*
+Set CloudFoundry credentials in the file '~/.gradle/init.gradle' like this:
+    allprojects {    
+        afterEvaluate { 
+            cloudfoundry {
+                username = 'username@email.com'
+                password = 'password'
+            }
+        }
+    }
+*/
+cloudfoundry {
+    application = 'vertx-vtoons'
+
+    framework = 'standalone'
+    runtime = 'java7'
+    memory = 128
+    uris = ['vertx-vtoons.cloudfoundry.com']
+
+    services = ['mongodb-vtoons']
+
+    file = file('build/vertx-vtoons.zip')
+    command = "vert.x-${vertxVersion}/bin/vertx run App.groovy"
+}
+
+task clean(type: Delete) {
+  delete 'build'
 }
 
 task assemble(type: Copy) {
-	group = 'vertx-vtoons'
+    into "${distDir}"
 
-    destinationDir file('build')
+    configurations.framework.each { tarFile ->
+        from tarTree(file(tarFile))
+    }
 
-	from configurations.framework
-	from(configurations.modules) {
-        into 'mods'
-	}
-	
-	doLast {
-	    ant.gunzip(src: "build/vert.x-${vertxVersion}.tar.gz", dest: "build/vert.x-${vertxVersion}.tar")
-	    ant.untar(src: "build/vert.x-${vertxVersion}.tar", dest: "build")
-	    // delete .tar.gz and .tar files
-	}
-	
+    from 'src'
+
+    doLast {
+        delete "${vertxDistDir}/docs"
+        delete "${vertxDistDir}/examples"
+    }
 }
 
-task dist(type: Zip) {
-group = 'vertx-vtoons'
-  
+task zip(type: Zip, dependsOn: 'assemble') {
+    destinationDir = file('build')
+    outputs.dir destinationDir
+    archiveName = 'vertx-vtoons.zip'
+    from "${distDir}"
 }
